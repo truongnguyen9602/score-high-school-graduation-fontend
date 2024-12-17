@@ -1,0 +1,124 @@
+@import "../../styles/_root.scss";
+
+.home {
+    // width: 100%;
+    // height: 100vh;
+
+    .appbar {
+        width: 100%;
+        height: 11.5rem !important;
+        background-color: #3d7ac1 !important;
+        box-shadow: none !important;
+        background-image: none;
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100% !important;
+            box-sizing: border-box;
+
+            .box {
+                padding-left: 3rem;
+
+                .typography1 {
+                    font-family: 'RetaFont', Times, serif;
+                    font-size: 2rem;
+                    color: #FFED46;
+                    line-height: 3rem;
+                }
+
+                .typography2 {
+                    font-family: 'RetaFont', Times, serif;
+                    font-size: 2.3rem;
+                    color: #FFED46;
+                    line-height: 3.6rem;
+                }
+            }
+
+        }
+    }
+
+    .body {
+        display: flex;
+        justify-content: center;
+        margin-top: 5rem;
+
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            // height: 46rem !important;
+            height: 40rem !important;
+            width: 98rem !important;
+            background-color: #EFEFEF !important;
+            border-radius: 5px;
+            border: 1px solid #A09C9C;
+
+            .titleBox {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+
+                .titleSmall {
+                    font-family: 'RetaFont';
+                    font-size: 1.6rem;
+                }
+
+                .titleBig {
+                    font-family: 'RetaFont', Times, serif;
+                    font-size: 2rem;
+                }
+            }
+            .note {
+                margin-top: 1rem;
+                margin-bottom: 0.7rem;
+            }
+            .textField {
+                width: 35rem;
+            }
+            .btn {
+                margin-top: 1.5rem;
+            }
+
+            .statistic {
+                min-height: 4rem;
+                margin-top: 2rem;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+
+                .subject {
+                    font-family: 'RetaFont', Times, serif;
+                    color: rgb(153, 15, 15);
+                    padding: 0.2rem 1rem;
+                    font-weight: 600;
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+
+    .footer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        color: white;
+        height: 5rem;
+        width: 100%;
+        background-color: #3d7ac1 !important;
+
+        position: absolute;
+        bottom: 0px;
+        left: 0;
+        right: 0;
+
+        .typography {
+            font-family: 'RetaFont', Times, serif;
+            font-size: 1.6rem;
+        }
+    }
+}

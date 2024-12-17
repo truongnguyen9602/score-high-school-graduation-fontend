@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graduation-fe-v1
+spec:
+  selector:
+    matchLabels:
+      app: graduation-fe-pod
+  template:
+    metadata:
+      labels:
+        app: graduation-fe-pod
+    spec:
+      containers:
+        - name: graduation-be-pod
+          image: ${REGION_REGISTRY}/${GOOGLE_PROJECT}/${REGISTRY_PROJECT}/prod/graduation-fe:${VERSION}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

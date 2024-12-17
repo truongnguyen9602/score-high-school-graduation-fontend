@@ -1,0 +1,83 @@
+pipeline {
+    agent any
+    environment {
+        GITHUB_TOKEN = credentials('1065fcd9-c161-4918-b82d-7e4ff251ef79')
+        GOOGLE_CREDENTIALS = credentials('32098b2f-a737-4a58-98fc-cc90e05491de') // Cấu hình thông tin xác thực Google Cloud
+        GOOGLE_PROJECT = 'doantn-442713' // ID dự án Google Cloud của bạn
+        CLUSTER_NAME = 'truongdatn' // Tên cluster GKE
+        CLUSTER_ZONE = 'us-central1' // Vị trí zone của cluster (ví dụ: us-central1-a)
+        REGION_REGISTRY = 'asia-southeast1-docker.pkg.dev'
+        REGISTRY_PROJECT = 'cicd-registry'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'master', url: "https://$GITHUB_TOKEN@github.com/duogglong/score-high-school-graduation-fe.git"
+            }
+        }
+        stage('Set VERSION from Git') {
+            steps {
+                script {
+                    // Lấy tag hoặc branch từ Git ref
+                    def tag = env.GIT_BRANCH.replaceAll("/", "-") ?: "latest" // Nếu không có tag, dùng "latest"
+                    echo "Generated Docker tag: $tag"
+                    env.VERSION = tag // Gán tag vào biến VERSION
+                }
+            }
+        }
+        stage('Set environment variables') {
+            steps {
+                script {
+                    // Copy .env.prod to .env
+                    sh 'cp .env.prod .env'
+                }
+            }
+        }
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+                    // Đăng nhập vào Google Artifact Registry
+                    sh """
+                        # Xóa tất cả container đã dừng và hình ảnh không được sử dụng
+                        sudo docker system prune -af
+
+                        # Đăng nhập vào Google Artifact Registry
+                        gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
+                        gcloud auth configure-docker $REGION_REGISTRY
+
+                        # Build Docker image
+                        docker build -t $REGION_REGISTRY/$GOOGLE_PROJECT/$REGISTRY_PROJECT/prod/graduation-fe:$VERSION .
+
+                        # Đẩy Docker image lên Artifact Registry
+                        docker push $REGION_REGISTRY/$GOOGLE_PROJECT/$REGISTRY_PROJECT/prod/graduation-fe:$VERSION
+                    """
+                }
+            }
+        }
+        stage('Deploy to GKE') {
+            steps {
+                withCredentials([file(credentialsId: '32098b2f-a737-4a58-98fc-cc90e05491de', variable: 'GOOGLE_CREDENTIALS')]) {
+                    sh """
+                        # Đăng nhập vào Google Cloud SDK
+                        gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
+
+                        # Cấu hình project
+                        gcloud config set project $GOOGLE_PROJECT
+
+                        # Lấy thông tin cluster và kết nối
+                        gcloud container clusters get-credentials $CLUSTER_NAME --zone $CLUSTER_ZONE
+
+                        # Thay thế các biến trong deployment.yaml
+                        envsubst < ./cicd/prod/deployment.yaml > ./cicd/prod/deployment-generated.yaml
+
+                        # Áp dụng deployment file đã thay thế
+                        kubectl apply -n prod -f ./cicd/prod/deployment-generated.yaml --validate=false
+
+                        # Kiểm tra trạng thái rollout
+                        kubectl delete pod -n prod -l app=graduation-fe-pod
+                    """
+                }
+            }
+        }
+    }
+}
