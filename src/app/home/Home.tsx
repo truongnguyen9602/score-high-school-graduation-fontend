@@ -67,7 +67,7 @@ function Home() {
           <Box>
             <TextField id="filled-basic" className={styles.textField} label="Số báo danh" variant="outlined" autoFocus={true} onChange={e => setSbd(e.target.value)} onKeyPress={handleKeyPress} />
           </Box>
-          <Button className={styles.btn} onClick={handleSubmit} variant="contained">Tra cứu </Button>
+          <Button className={styles.btn} onClick={handleSubmit} variant="contained">Tìm kiếm </Button>
 
           <Container className={styles.statistic}>
             {data?.toan &&
